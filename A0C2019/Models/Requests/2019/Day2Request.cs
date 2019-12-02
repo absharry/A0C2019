@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AdventOfCode.Models.Requests
+namespace AdventOfCode.Models.Requests._2019
 {
-    public class Day1Request
+    public class Day2Request
     {
-        public string[] Input { get; set; }
+        public int[] Input { get; set; }
     }
 }
