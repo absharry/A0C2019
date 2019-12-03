@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using AdventOfCode.Domain.Models;
@@ -85,7 +86,7 @@ namespace AdventOfCode.Controllers
         [Route("3")]
         public Day3Response Day3([FromBody] Day3Request input)
         {
-            var firstLine = new List<Coordinate> { new Coordinate(0, 0) };
+            var firstLine = new List<Point> { new Point(0, 0) };
 
             foreach (var instruction in input.FirstLine)
             {
@@ -98,7 +99,7 @@ namespace AdventOfCode.Controllers
                 }
             }
 
-            var secondLine = new List<Coordinate> { new Coordinate(0, 0) };
+            var secondLine = new List<Point> { new Point(0, 0) };
 
             foreach (var instruction in input.SecondLine)
             {
@@ -109,56 +110,49 @@ namespace AdventOfCode.Controllers
                 {
                     secondLine.Add(this.GetCoordinateAfterInstruction(direction, secondLine.Last()));
                 }
-            }
+            }            
+            var intersects = firstLine.Intersect(secondLine);
 
-            Dictionary<Coordinate, double> distances = new Dictionary<Coordinate, double>();
+            Dictionary<Point, double> distances = new Dictionary<Point, double>();
 
-            foreach (var item in firstLine)
+            foreach (var item in intersects)
             {
-                if(secondLine.Any(x => x.X == item.X && x.Y == item.Y))
+                if (item.X != 0 && item.Y != 0)
                 {
                     distances.Add(item, Math.Abs(0 - item.X) + Math.Abs(0 - item.Y));
                 }
             }
-            //var previousCoord = new Coordinate(0, 0);
 
-            //foreach (var instruction in input.SecondLine)
-            //{
-            //    var direction = instruction[0];
-            //    var amountOfSteps = int.Parse(instruction[1..]);
+            Dictionary<Point, double> steps = new Dictionary<Point, double>();
+            foreach (var item in intersects)
+            {
+                if (item.X != 0 && item.Y != 0)
+                {
+                    var index1 = firstLine.IndexOf(item);
+                    var index2 = secondLine.IndexOf(item);
 
-            //    for (int i = 0; i < amountOfSteps; i++)
-            //    {
-            //        var coord = this.GetCoordinateAfterInstruction(direction, previousCoord);
-            //        previousCoord = coord;
+                    steps.Add(item, index1 + index2);
+                }
+            }
 
-            //        if (firstLine.Any(x => x.X == coord.X && x.Y == coord.Y ))
-            //        {
-            //            distances.Add(coord, );
-            //        }
-            //    }
-            //}
-
-            return new Day3Response(distances.Min(x => x.Value), 0);
+            return new Day3Response(distances.Min(x => x.Value), steps.Min(x => x.Value));
         }
 
-        private Coordinate GetCoordinateAfterInstruction(char instruction, Coordinate initialCoordinate)
+        private Point GetCoordinateAfterInstruction(char instruction, Point initialCoordinate)
         {            
             switch (instruction)
             {
                 case 'R':
-                    return new Coordinate(initialCoordinate.X +1 , initialCoordinate.Y);
+                    return new Point(initialCoordinate.X +1 , initialCoordinate.Y);
                 case 'L':
-                    return new Coordinate(initialCoordinate.X - 1, initialCoordinate.Y);
+                    return new Point(initialCoordinate.X - 1, initialCoordinate.Y);
                 case 'U':
-                    return new Coordinate(initialCoordinate.X, initialCoordinate.Y + 1);
+                    return new Point(initialCoordinate.X, initialCoordinate.Y + 1);
                 case 'D':
-                    return new Coordinate(initialCoordinate.X, initialCoordinate.Y - 1);
+                    return new Point(initialCoordinate.X, initialCoordinate.Y - 1);
                 default: throw new Exception("something went very wrong");
             }
         }
-
-
 
         private void IntCode(int[] input, int position1Replacement, int position2Replacement)
         {
