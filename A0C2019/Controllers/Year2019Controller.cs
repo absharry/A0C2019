@@ -113,13 +113,13 @@ namespace AdventOfCode.Controllers
 
             Dictionary<Coordinate, double> distances = new Dictionary<Coordinate, double>();
 
-            Parallel.ForEach(firstLine, item =>
+            foreach (var item in firstLine)
             {
-                if (secondLine.Any(x => x.X == item.X && x.Y == item.Y))
+                if(secondLine.Any(x => x.X == item.X && x.Y == item.Y))
                 {
                     distances.Add(item, Math.Abs(0 - item.X) + Math.Abs(0 - item.Y));
                 }
-            });
+            }
             //var previousCoord = new Coordinate(0, 0);
 
             //foreach (var instruction in input.SecondLine)
