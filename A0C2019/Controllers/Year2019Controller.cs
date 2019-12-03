@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AdventOfCode.Domain.Models;
 using AdventOfCode.Models.Requests;
 using AdventOfCode.Models.Requests._2019;
 using AdventOfCode.Models.Responses._2019;
@@ -79,6 +80,85 @@ namespace AdventOfCode.Controllers
 
             return new Day2Response(value1[0], 100 * noun + verb);
         }
+
+        [HttpPost]
+        [Route("3")]
+        public Day3Response Day3([FromBody] Day3Request input)
+        {
+            var firstLine = new List<Coordinate> { new Coordinate(0, 0) };
+
+            foreach (var instruction in input.FirstLine)
+            {
+                var direction = instruction[0];
+                var amountOfSteps = int.Parse(instruction[1..]);
+
+                for (int i = 0; i < amountOfSteps; i++)
+                {
+                    firstLine.Add(this.GetCoordinateAfterInstruction(direction, firstLine.Last()));
+                }
+            }
+
+            var secondLine = new List<Coordinate> { new Coordinate(0, 0) };
+
+            foreach (var instruction in input.SecondLine)
+            {
+                var direction = instruction[0];
+                var amountOfSteps = int.Parse(instruction[1..]);
+
+                for (int i = 0; i < amountOfSteps; i++)
+                {
+                    secondLine.Add(this.GetCoordinateAfterInstruction(direction, secondLine.Last()));
+                }
+            }
+
+            Dictionary<Coordinate, double> distances = new Dictionary<Coordinate, double>();
+
+            Parallel.ForEach(firstLine, item =>
+            {
+                if (secondLine.Any(x => x.X == item.X && x.Y == item.Y))
+                {
+                    distances.Add(item, Math.Abs(0 - item.X) + Math.Abs(0 - item.Y));
+                }
+            });
+            //var previousCoord = new Coordinate(0, 0);
+
+            //foreach (var instruction in input.SecondLine)
+            //{
+            //    var direction = instruction[0];
+            //    var amountOfSteps = int.Parse(instruction[1..]);
+
+            //    for (int i = 0; i < amountOfSteps; i++)
+            //    {
+            //        var coord = this.GetCoordinateAfterInstruction(direction, previousCoord);
+            //        previousCoord = coord;
+
+            //        if (firstLine.Any(x => x.X == coord.X && x.Y == coord.Y ))
+            //        {
+            //            distances.Add(coord, );
+            //        }
+            //    }
+            //}
+
+            return new Day3Response(distances.Min(x => x.Value), 0);
+        }
+
+        private Coordinate GetCoordinateAfterInstruction(char instruction, Coordinate initialCoordinate)
+        {            
+            switch (instruction)
+            {
+                case 'R':
+                    return new Coordinate(initialCoordinate.X +1 , initialCoordinate.Y);
+                case 'L':
+                    return new Coordinate(initialCoordinate.X - 1, initialCoordinate.Y);
+                case 'U':
+                    return new Coordinate(initialCoordinate.X, initialCoordinate.Y + 1);
+                case 'D':
+                    return new Coordinate(initialCoordinate.X, initialCoordinate.Y - 1);
+                default: throw new Exception("something went very wrong");
+            }
+        }
+
+
 
         private void IntCode(int[] input, int position1Replacement, int position2Replacement)
         {
