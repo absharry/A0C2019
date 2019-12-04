@@ -138,20 +138,75 @@ namespace AdventOfCode.Controllers
             return new Day3Response(distances.Min(x => x.Value), steps.Min(x => x.Value));
         }
 
-        private Point GetCoordinateAfterInstruction(char instruction, Point initialCoordinate)
-        {            
-            switch (instruction)
+        [HttpPost]
+        [Route("4")]
+        public Day4Response Day4([FromBody] Day4Request input)
+        {
+            var valid = new List<double>();
+            var valid2 = new List<double>();
+
+            for (double i = input.Start; i < input.End + 1; i++)
             {
-                case 'R':
-                    return new Point(initialCoordinate.X +1 , initialCoordinate.Y);
-                case 'L':
-                    return new Point(initialCoordinate.X - 1, initialCoordinate.Y);
-                case 'U':
-                    return new Point(initialCoordinate.X, initialCoordinate.Y + 1);
-                case 'D':
-                    return new Point(initialCoordinate.X, initialCoordinate.Y - 1);
-                default: throw new Exception("something went very wrong");
+                var numberAsString = i.ToString();
+                if (this.CountOfDigitsInNumber(i, '1') > 1 ||
+                    this.CountOfDigitsInNumber(i, '2') > 1 ||
+                    this.CountOfDigitsInNumber(i, '3') > 1 ||
+                    this.CountOfDigitsInNumber(i, '4') > 1 ||
+                    this.CountOfDigitsInNumber(i, '5') > 1 ||
+                    this.CountOfDigitsInNumber(i, '6') > 1 ||
+                    this.CountOfDigitsInNumber(i, '7') > 1 ||
+                    this.CountOfDigitsInNumber(i, '8') > 1 ||
+                    this.CountOfDigitsInNumber(i, '9') > 1 ||
+                    this.CountOfDigitsInNumber(i, '0') > 1)
+                {
+                    if (int.Parse(numberAsString[0].ToString()) <= int.Parse(numberAsString[1].ToString()) &&
+                        int.Parse(numberAsString[1].ToString()) <= int.Parse(numberAsString[2].ToString()) &&
+                        int.Parse(numberAsString[2].ToString()) <= int.Parse(numberAsString[3].ToString()) &&
+                        int.Parse(numberAsString[3].ToString()) <= int.Parse(numberAsString[4].ToString()) &&
+                        int.Parse(numberAsString[4].ToString()) <= int.Parse(numberAsString[5].ToString())) 
+                    {
+                        valid.Add(i);
+                    }
+                }
             }
+
+            foreach (var number in valid)
+            { 
+                if (this.CountOfDigitsInNumber(number, '1') == 2 ||
+                    this.CountOfDigitsInNumber(number, '2') == 2 ||
+                    this.CountOfDigitsInNumber(number, '3') == 2 ||
+                    this.CountOfDigitsInNumber(number, '4') == 2 ||
+                    this.CountOfDigitsInNumber(number, '5') == 2 ||
+                    this.CountOfDigitsInNumber(number, '6') == 2 ||
+                    this.CountOfDigitsInNumber(number, '7') == 2 ||
+                    this.CountOfDigitsInNumber(number, '8') == 2 ||
+                    this.CountOfDigitsInNumber(number, '9') == 2 ||
+                    this.CountOfDigitsInNumber(number, '0') == 2)
+                {
+                    valid2.Add(number);
+                }
+            }
+
+            return new Day4Response(valid.Count(), valid2.Count());
+        }
+
+        private int CountOfDigitsInNumber(double number, char character)
+        {
+            var numberAsString = number.ToString();
+
+            return numberAsString.Count(x => x == character);
+        }
+
+        private Point GetCoordinateAfterInstruction(char instruction, Point initialCoordinate)
+        {
+            return instruction switch
+            {
+                'R' => new Point(initialCoordinate.X + 1, initialCoordinate.Y),
+                'L' => new Point(initialCoordinate.X - 1, initialCoordinate.Y),
+                'U' => new Point(initialCoordinate.X, initialCoordinate.Y + 1),
+                'D' => new Point(initialCoordinate.X, initialCoordinate.Y - 1),
+                _ => throw new Exception("something went very wrong"),
+            };
         }
 
         private void IntCode(int[] input, int position1Replacement, int position2Replacement)
