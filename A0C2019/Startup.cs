@@ -49,8 +49,6 @@ namespace A0C2019
 
             app.UseRouting();
 
-            app.UseAuthorization();
-
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>

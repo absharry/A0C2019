@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AdventOfCode.Domain.Models;
 using AdventOfCode.Models.Requests;
 using AdventOfCode.Models.Requests._2019;
-using AdventOfCode.Models.Responses._2019;
+using AdventOfCode.Models.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +24,7 @@ namespace AdventOfCode.Controllers
 
         [HttpPost]
         [Route("1")]
-        public Day1Response Day1([FromBody] Day1Request input)
+        public BaseResponse Day1([FromBody] Day1Request input)
         {
             var sum1 = input.Input.Sum(x => Math.Round(double.Parse(x) / 3, MidpointRounding.ToZero) - 2);
 
@@ -44,12 +44,12 @@ namespace AdventOfCode.Controllers
                 sum2 += fuelRequirement;
             }
 
-            return new Day1Response(sum1, sum2);
+            return new BaseResponse(sum1, sum2);
         }
 
         [HttpPost]
         [Route("2")]
-        public Day2Response Day2([FromBody] Day2Request input)
+        public BaseResponse Day2([FromBody] Day2Request input)
         {
             var value1 = new int[input.Input.Length];
             Array.Copy(input.Input, value1, value1.Length);
@@ -79,12 +79,12 @@ namespace AdventOfCode.Controllers
                 output = value2[0];
             }
 
-            return new Day2Response(value1[0], 100 * noun + verb);
+            return new BaseResponse(value1[0], 100 * noun + verb);
         }
 
         [HttpPost]
         [Route("3")]
-        public Day3Response Day3([FromBody] Day3Request input)
+        public BaseResponse Day3([FromBody] Day3Request input)
         {
             var firstLine = new List<Point> { new Point(0, 0) };
 
@@ -135,12 +135,12 @@ namespace AdventOfCode.Controllers
                 }
             }
 
-            return new Day3Response(distances.Min(x => x.Value), steps.Min(x => x.Value));
+            return new BaseResponse(distances.Min(x => x.Value), steps.Min(x => x.Value));
         }
 
         [HttpPost]
         [Route("4")]
-        public Day4Response Day4([FromBody] Day4Request input)
+        public BaseResponse Day4([FromBody] Day4Request input)
         {
             var valid = new List<double>();
             var valid2 = new List<double>();
@@ -187,7 +187,15 @@ namespace AdventOfCode.Controllers
                 }
             }
 
-            return new Day4Response(valid.Count(), valid2.Count());
+            return new BaseResponse(valid.Count(), valid2.Count());
+        }
+
+        [HttpPost]
+        [Route("5")]
+        public BaseResponse Day5([FromBody] Day5Request input)
+        {
+
+            return new BaseResponse(0, 0);
         }
 
         private int CountOfDigitsInNumber(double number, char character)
@@ -214,32 +222,7 @@ namespace AdventOfCode.Controllers
             input[1] = position1Replacement;
             input[2] = position2Replacement;
 
-            for (int i = 0; i < input.Length; i += 4)
-            {
-                var instruction = input[i];
 
-                if (instruction == 99)
-                {
-                    break;
-                }
-
-                var firstIndex = input[i + 1];
-                var secondIndex = input[i + 2];
-                var thirdIndex = input[i + 3];
-
-                if (instruction == 1)
-                {
-                    input[thirdIndex] = input[firstIndex] + input[secondIndex];
-                }
-                else if (instruction == 2)
-                {
-                    input[thirdIndex] = input[firstIndex] * input[secondIndex];
-                }
-                else
-                {
-                    throw new Exception("something went horrifically wrong");
-                }
-            }
         }
     }
 }
