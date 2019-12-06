@@ -198,6 +198,62 @@ namespace AdventOfCode.Controllers
             return new BaseResponse(0, 0);
         }
 
+        [HttpPost]
+        [Route("6")]
+        public BaseResponse Day6([FromBody] Day6Request input)
+        {
+            var planets = new List<PlanateryBody>();
+
+            foreach (var orbit in input.Input)
+            {
+                var orbitSplit = orbit.Split(')');
+                var focalPlanetString = orbitSplit[0];
+                var orbitingPlanetString = orbitSplit[1];
+
+                if (!planets.Any(x => x.Name == orbitingPlanetString))
+                {
+                    planets.Add(new PlanateryBody(orbitingPlanetString));
+                }
+
+                if (!planets.Any(x => x.Name == focalPlanetString))
+                {
+                    planets.Add(new PlanateryBody(focalPlanetString));
+                }
+
+                var orbitingPlanet = planets.FirstOrDefault(x => x.Name == orbitingPlanetString);
+                var focalPlanet = planets.FirstOrDefault(x => x.Name == focalPlanetString);
+
+                orbitingPlanet.OrbitingAround = focalPlanet;
+            }
+            
+            var count = 0;
+
+            foreach (var planet in planets)
+            {
+                count += planet.TotalOrbits(0);
+            }
+
+            var san = planets.FirstOrDefault(x => x.Name == "SAN");
+            var you = planets.FirstOrDefault(x => x.Name == "YOU");
+
+            var sanPlanets = san.GetAllPlanetsOrbiting(new List<PlanateryBody>());
+            var youPlanets = you.GetAllPlanetsOrbiting(new List<PlanateryBody>());
+
+            var countOfSteps = 0;
+
+            foreach(var planet in youPlanets)
+            {
+                if (sanPlanets.Contains(planet))
+                {
+                    countOfSteps += youPlanets.IndexOf(planet);
+                    countOfSteps += sanPlanets.IndexOf(planet);
+                    break;
+                }
+            }
+
+            return new BaseResponse(count, countOfSteps);
+        }
+
         private int CountOfDigitsInNumber(double number, char character)
         {
             var numberAsString = number.ToString();
